@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # #### Base :A function which will give histogram and boxplot for numerical variables and bar plots for categorical variables
@@ -7,7 +7,7 @@
 #    - If the column name specifed is wrong then it exports the graph for only correct column labels.
 #    - If all the column labels are wrong it exports the graph for all the column labels.
 
-# In[5]:
+# In[18]:
 
 
 def Graph(data1,column=None,directory=None):
@@ -24,20 +24,22 @@ def Graph(data1,column=None,directory=None):
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
+    import seaborn as sns
+    get_ipython().run_line_magic('matplotlib', 'inline')
     
     if directory==None:
         directory=os.getcwd()                    #Getting the current directory if directory is not specified.
-    else:
-        orig_dir=os.getcwd()
+    orig_dir=os.getcwd()
     
     plt.ioff()                                    #Turn interactive ploting off.
     plt.rcParams['figure.figsize'] = (8,6)
-    
+
     if os.path.exists(directory):
         os.chdir(directory)
     else:
         print('The given directory does not exists and saving the graphs in the current directory ',os.getcwd())
         directory=os.getcwd()
+        
     if column==None:
         column=data1.columns                     #Getting all the columns if columns are not specified.
         df=data1
@@ -55,7 +57,7 @@ def Graph(data1,column=None,directory=None):
     df_dtype=pd.DataFrame(df.dtypes)             
     for i in column:
         if (df_dtype.loc[i,][0]=='object'):      #categorical values.
-            fig=plt.figure()
+            fig=plt.figure(figsize=(10,6))
             df[i].value_counts().plot(kind='barh')  #plotting bar graph.
             plt.title('Bar graph of '+str(i))    
             plt.ylabel(str(i))
@@ -64,8 +66,7 @@ def Graph(data1,column=None,directory=None):
             plt.close(fig)
         else:                                        #for all numerical variables.
             fig = plt.figure()
-            plt.boxplot(x=df.loc[:,i])              #plotting boxplot.
-            plt.title("Box plot of " + str(i))
+            sns.boxplot(x=df.loc[:,i],orient='vertical').set_title("Box plot of " + str(i))              #plotting boxplot.
             plt.ylabel(str(i))
             plt.savefig("BoxPlot of "+str(i) +'.png')
             plt.close(fig)
@@ -83,7 +84,7 @@ def Graph(data1,column=None,directory=None):
 # #### Improvisation 1: 
 #    - Plotting bar plots for most frequent unique values upto 25.
 
-# In[6]:
+# In[17]:
 
 
 def Graph1(data1,column=None,directory=None):
@@ -102,14 +103,15 @@ def Graph1(data1,column=None,directory=None):
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
+    import seaborn as sns
+    get_ipython().run_line_magic('matplotlib', 'inline')
+    
     
     if directory==None:
         directory=os.getcwd()                    #Getting the current directory if directory is not specified.
-    else:
-        orig_dir=os.getcwd()
+    orig_dir=os.getcwd()
     plt.ioff()
     plt.rcParams['figure.figsize'] = (8,6)
-    
     if os.path.exists(directory):
         os.chdir(directory)
     else:
@@ -135,7 +137,7 @@ def Graph1(data1,column=None,directory=None):
         if (df_dtype.loc[i,][0]=='object'):             #categorical values
             fig=plt.figure()
             df[i].value_counts()[:25].plot(kind='barh')  #plotting top 25 unique values only
-            plt.title('Bar graph of'+str(i))
+            plt.title('Bar graph of '+str(i))
             plt.ylabel(str(i))
             plt.xlabel('Count')
             plt.tight_layout()
@@ -144,7 +146,7 @@ def Graph1(data1,column=None,directory=None):
         elif (df_dtype.loc[i,][0]=='int64') and len((df[i].unique()))<=25: #numerical variables having less than equal 25 unique values
             fig=plt.figure()
             df[i].value_counts()[:25].plot(kind='barh')      #plotting bar graph
-            plt.title('Bar graph of'+str(i))
+            plt.title('Bar graph of '+str(i))
             plt.ylabel(str(i))
             plt.xlabel('Count')
             plt.tight_layout()
@@ -152,15 +154,14 @@ def Graph1(data1,column=None,directory=None):
             plt.close(fig)
         else:
             fig = plt.figure()
-            plt.boxplot(x=df.loc[:,i],notch=True)            #plotting boxplot
-            plt.title("Box plot of " + str(i))
+            sns.boxplot(x=df.loc[:,i],notch=True,orient='vertical').set_title("Box plot of " + str(i))           #plotting boxplot
             plt.ylabel(str(i))
             plt.tight_layout()
             plt.savefig("BoxPlot of "+str(i) +'.png')
             plt.close(fig)
             
-            fig = plt.figure()
-            plt.hist(x=df.loc[:,i],color='black',edgecolor='yellow')    #plotting histogram
+            fig = plt.figure()   
+            plt.hist(x=df.loc[:,i],color='black',edgecolor='yellow')    #plotting histogram.    
             plt.ylabel("Frequency")
             plt.xlabel(str(i))
             plt.title("Histogram of " + str(i))
@@ -176,7 +177,7 @@ def Graph1(data1,column=None,directory=None):
 #    - Ploting the graph of boxplot and histogram side by side for a column label.
 #    - Creating a local module UnivariateAnalysis which can be used to import these functions.
 
-# In[7]:
+# In[1]:
 
 
 def Graph2(data1,column=None,directory=None):
@@ -198,11 +199,12 @@ def Graph2(data1,column=None,directory=None):
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
+    import seaborn as sns
+    get_ipython().run_line_magic('matplotlib', 'inline')
     
     if directory==None:
-        directory=os.getcwd()                         #Getting the current directory if directory is not specified
-    else:
-        orig_dir=os.getcwd()
+        directory=os.getcwd()                    #Getting the current directory if directory is not specified.
+    orig_dir=os.getcwd()
     
     plt.style.use("ggplot")
     plt.ioff()
@@ -241,7 +243,7 @@ def Graph2(data1,column=None,directory=None):
         if (df_dtype.loc[i,][0]=='object'):
             fig=plt.figure()
             df[i].value_counts()[:25].plot(kind='barh')  #plotting top 25 unique values only
-            plt.title('Bar graph of'+str(i))
+            plt.title('Bar graph of '+str(i))
             plt.ylabel(str(i))
             plt.xlabel('Count')
             plt.tight_layout()
@@ -250,19 +252,19 @@ def Graph2(data1,column=None,directory=None):
         elif (df_dtype.loc[i,][0]=='int64') and len((df[i].unique()))<=25: #numerical variables having less than equal 25 unique values
             fig=plt.figure()
             df[i].value_counts()[:25].plot(kind='barh')   #plotting bar graph
-            plt.title('Bar graph of'+str(i))
+            plt.title('Bar graph of '+str(i))
             plt.ylabel(str(i))
             plt.xlabel('Count')
             plt.tight_layout()
             plt.savefig("Bar graph of "+ str(i) +'.png')
             plt.close(fig)
         else:
-            fig, (ax1,ax2) = plt.subplots(ncols= 2, figsize = (12,6)) 
-            ax1.hist(x = df.loc[:,i],color='black',edgecolor='yellow') #creating histogram in the same graph
+            fig, (ax1,ax2) = plt.subplots(ncols= 2, figsize = (12,6))       
+            ax1.hist(x = df.loc[:,i],color='black',edgecolor='yellow')       #creating histogram in the same graph
             ax1.set_title("Histogram of " + str(i))
             ax1.set_xlabel(str(i))
             ax1.set_ylabel("Frequency")
-            ax2.boxplot(x=df.loc[:,i],notch=True) #creating boxplot in same graph
+            sns.boxplot(x=df.loc[:,i],notch=True,orient='vertical') #creating boxplot in same graph
             ax2.set_title("Box plot of " + str(i))
             ax2.set_ylabel(str(i))
             plt.tight_layout()
